@@ -1,0 +1,3 @@
+/user/0/iknem/C++/TP_1/cppma-spring2026-lab1/CPPMA-Spring2026-Lab1/build/CMakeFiles/exe.dir
+/user/0/iknem/C++/TP_1/cppma-spring2026-lab1/CPPMA-Spring2026-Lab1/build/CMakeFiles/edit_cache.dir
+/user/0/iknem/C++/TP_1/cppma-spring2026-lab1/CPPMA-Spring2026-Lab1/build/CMakeFiles/rebuild_cache.dir

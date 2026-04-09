@@ -1,0 +1,11 @@
+Analyse de performance - TP Particules
+
+Benchmark des collections (insertion + parcours) :
+N=64   : vector 0.000103s, list 0.000074s, deque 0.000080s
+N=128  : vector 0.000080s, list 0.000080s, deque 0.000086s
+N=256  : vector 0.000169s, list 0.000150s, deque 0.000187s
+N=512  : vector 0.000343s, list 0.000338s, deque 0.000365s
+N=1024 : vector 0.000606s, list 0.000741s, deque 0.000686s
+N=2048 : vector 0.001431s, list 0.001291s, deque 0.001568s
+
+std::vector choisi pour la simulation.
