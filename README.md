@@ -9,6 +9,9 @@ Implémentation progressive d'un simulateur de dynamique moléculaire en C++.
 
 ## Structure du projet
 
+## Structure du projet
+
+```text
 .
 ├── include/
 │   ├── Particule.hpp      # Classe Particule (position, vitesse, force)
@@ -16,6 +19,8 @@ Implémentation progressive d'un simulateur de dynamique moléculaire en C++.
 ├── demo/
 │   └── demo.cpp           # Main : simulation + visualisation
 └── README.md
+```
+
 ## TPs
 
 | TP | Contenu |
@@ -45,17 +50,7 @@ g++ -O3 -Wall -Wextra -Iinclude demo/demo.cpp -o Simulation
 
 ## Visualisation
 
-Un script Python génère les snapshots initial et final de la simulation :
 
-```bash
-python visualiser.py
-```
-
-Nécessite : `matplotlib`, `pandas`
-
-```bash
-pip install matplotlib pandas
-```
 
 ## Paramètres de la simulation (TP4 Q6)
 
