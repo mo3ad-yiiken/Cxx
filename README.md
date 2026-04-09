@@ -55,19 +55,11 @@ Implémentation progressive d'un simulateur de dynamique moléculaire en C++.
 ## Compilation
 
 ```bash
-g++ -O3 -Wall -Wextra -Iinclude demo/demo.cpp -o Simulation
-./Simulation
+g++ -O3 -Wall -Wextra -Iinclude demo/demo.cpp -o Blabla
+./Blabla
 ```
 
 ## Visualisation
 
 
 
-## Paramètres de la simulation (TP4 Q6)
-
-- Domaine : `Lx=250`, `Ly=120`
-- `σ=1`, `ε=1`, `rcut=2.5`
-- `dt=0.00005`, `tend=19.5`
-- Distance inter-particules : `d0 = 2^(1/6)`
-- Carré rouge : 40×40 particules, vitesse initiale `(0, -10)`
-- Rectangle bleu : 160×40 particules, vitesse initiale `(0, 0)`
