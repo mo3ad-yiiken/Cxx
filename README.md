@@ -12,13 +12,25 @@ Implémentation progressive d'un simulateur de dynamique moléculaire en C++.
 ## Structure du projet
 
 ```text
-.
+├── CMakeLists.txt       
+├── README.md            
+├── doc/
+│   ├── CMakeLists.txt   
+│   ├── analyse.txt      
+│   └── doxyfilerc       
 ├── include/
-│   ├── Particule.hpp      # Classe Particule (position, vitesse, force)
-│   └── Univers.hxx        # Classes Cellule, Grille, Univers
+│   ├── Particule.hpp    
+│   └── Univers.hxx      
+├── src/
+│   ├── CMakeLists.txt
+│   └── Univers.cxx      
+├── test/
+│   ├── CMakeLists.txt
+│   └── test_forces.cxx  
 ├── demo/
-│   └── demo.cpp           # Main : simulation + visualisation
-└── README.md
+│   ├── CMakeLists.txt
+│   └── demo.cpp         
+└── build/               
 ```
 
 ## TPs
