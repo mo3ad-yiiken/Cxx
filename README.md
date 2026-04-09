@@ -7,7 +7,6 @@
 
 Implémentation progressive d'un simulateur de dynamique moléculaire en C++.
 
-## Structure du projet
 
 ## Structure du projet
 
