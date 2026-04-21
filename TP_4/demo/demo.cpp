@@ -5,54 +5,144 @@
 #include <chrono>
 #include <vector>
 #include <fstream>
+#include <string>
 
 
+std::vector<Particule*> collecterToutesLesParticules(Univers& univers) {
+    
+    std::vector<Particule*> liste_pointeurs;
+
+    for (Cellule& ma_cellule : univers.getCellules()) {
+            for (Particule& ma_particule : ma_cellule) {
+            liste_pointeurs.push_back(&ma_particule);
+        }
+    }
+    return liste_pointeurs;
+}
+
+
+void sauvegarder(const std::string& nom, Univers& univ) {
+    std::ofstream out(nom);
+    out << "x,y,objet\n";
+    std::vector<Particule*> ptrs = collecterToutesLesParticules(univ);
+    for (Particule* ptr : ptrs) {
+        std::string obj = (ptr->getMas() < 1.0005) ? "carre" : "rectangle";
+        out << ptr->getPosition(0) << "," << ptr->getPosition(1) << "," << obj << "\n";
+    }
+}
 
 void Stormer_Verlet(Univers& univers, int nb_part, int dim, double tend, double dt) {
-    auto collecter = [&]() {
-        std::vector<Particule*> ptrs;
-        for (Cellule& c : univers.getCellules())
-            for (Particule& p : c)
-                ptrs.push_back(&p);
-        return ptrs;
-    };
-
+    // std::vector<Type> nom(taille, valeur_par_defaut);
     std::vector<std::vector<double>> Fold(nb_part, std::vector<double>(dim, 0.0));
-    univers.all_forces();
 
+    univers.all_forces();
+    
     double t = 0.0;
     int step = 0;
 
-
+    sauvegarder("frames/frame_0.csv",univers);
     while (t < tend) {
         t += dt;
         step++;
 
-        auto ptrs = collecter();
-        for (size_t i = 0; i < ptrs.size(); ++i) {
-            Particule& p = *ptrs[i];
+        auto ptrs = collecterToutesLesParticules(univers);
+            for (Particule* ptr : ptrs) {
+            Particule& p = *ptr;
+            int i = p.getId(); 
             double mi = p.getMas();
+            
             for (int k = 0; k < dim; ++k) {
-                double xk  = p.getPosition(k);
-                double vk  = p.getVitesse(k);
-                double Fik = p.getForce(k);
-                p.setPosition(k, xk + dt * (vk + 0.5 / mi * Fik * dt));
-                Fold[i][k] = Fik;
+                double xi = p.getPosition(k);
+                double vi = p.getVitesse(k);
+                double Fi = p.getForce(k);
+                p.setPosition(k, xi + dt * (vi + 0.5 / mi * Fi * dt));
+                Fold[i][k] = Fi;
             }
-        }
-
+        } 
         univers.maj_cellules();
         univers.all_forces();
 
-        ptrs = collecter();
-        for (size_t i = 0; i < ptrs.size(); ++i) {
-            Particule& p = *ptrs[i];
+        ptrs = collecterToutesLesParticules(univers);
+        for (Particule* ptr : ptrs) {
+            Particule& p = *ptr;
+            int i = p.getId(); 
             double mi = p.getMas();
+            
             for (int k = 0; k < dim; ++k) {
-                double vk  = p.getVitesse(k);
-                double Fik = p.getForce(k);
-                p.setVitesse(k, vk + dt * 0.5 / mi * (Fik + Fold[i][k]));
+                double vi = p.getVitesse(k);
+                double Fi = p.getForce(k);
+                double Fold_i = Fold[i][k];
+                p.setVitesse(k, vi + dt * 0.5 / mi * (Fi + Fold_i));
             }
+        } 
+
+        // 
+        if (step % 5 == 0) {
+            std::cout << "Progression t = " << t << " / " << tend << "\r" << std::flush;
+            sauvegarder("frames/frame_" + std::to_string(step) + ".csv",univers);
         }
-    }
+    } 
+    sauvegarder("etat_final.csv",univers);
+    std::cout << "\nSimulation terminee a t=" << t << "\n";
+}
+
+int main() {
+    const int    dim    = 2;
+    const double Lx     = 250.0;
+    const double Ly     = 120.0;
+    const double rcut   = 2.5;
+    const double dt     = 0.005; 
+    const double tend   = 5.0;   
+    const double sigma  = 1.0;
+    const double d0     = std::pow(2.0, 1.0/6.0) * sigma;
+
+    int ncd_x = std::max(1, static_cast<int>(Lx / rcut));
+    int ncd_y = std::max(1, static_cast<int>(Ly / rcut));
+    double cell_dx = Lx / ncd_x;
+    double cell_dy = Ly / ncd_y;
+
+    std::vector<Cellule> cellules;
+    for (int y = 0; y < ncd_y; ++y)
+        for (int x = 0; x < ncd_x; ++x)
+            cellules.emplace_back((x + 0.5) * cell_dx, (y + 0.5) * cell_dy);
+
+    int nb_part = 40*40 + 160*40;
+    Univers univers(dim, nb_part, Lx, Ly, rcut, cellules);
+    univers.initialiserVoisins(ncd_x, ncd_y);
+
+    auto placer = [&](Particule& p) {
+        int cx = std::max(0, std::min(static_cast<int>(p.getPosition(0) / cell_dx), ncd_x - 1));
+        int cy = std::max(0, std::min(static_cast<int>(p.getPosition(1) / cell_dy), ncd_y - 1));
+        univers.getCellules()[cx + cy * ncd_x].ajouterParticule(p);
+    };
+
+    int id = 0;
+
+    double carre_x0 = (Lx - 39.0 * d0) / 2.0;
+    double carre_y0 = 75.0;
+    for (int j = 0; j < 40; ++j)
+        for (int i = 0; i < 40; ++i) {
+            Particule p({carre_x0 + i*d0, carre_y0 + j*d0},
+                        {0.0, -10}, {0.0, 0.0},
+                        1.0, id++, Categorie::Proton);
+            placer(p);
+        }
+
+    double rect_x0 = (Lx - 159.0 * d0) / 2.0;
+    double rect_y0 = 10.0;
+    for (int j = 0; j < 40; ++j)
+        for (int i = 0; i < 160; ++i) {
+            Particule p({rect_x0 + i*d0, rect_y0 + j*d0},
+                        {0.0, 0.0}, {0.0, 0.0},
+                        1.001, id++, Categorie::Proton);
+            placer(p);
+        }
+
+    std::cout << "Particules placees : " << id << "\n";
+
+    auto start = std::chrono::steady_clock::now();
+    Stormer_Verlet(univers, nb_part, dim, tend, dt);
+    auto end_t = std::chrono::steady_clock::now();
+    std::cout << "Elapsed: " << std::chrono::duration<double>(end_t-start).count() << "s\n";
+    return 0;
 }

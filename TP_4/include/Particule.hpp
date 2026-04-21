@@ -39,6 +39,7 @@ class Particule {
         void setVitesse(int i, double val) { vitesse[i] = val; }
         void setForce(int i, double val) { force[i] = val; }
         double getMas() const { return m; }
+        int getId() const { return Id; }
         // void Fij(const Particule& p2){
         //     double rij = 0;
         //     double m2 =  p2.getMas();

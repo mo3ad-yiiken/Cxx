@@ -79,7 +79,7 @@ class Grille {
 class Univers { 
     private :
         int dim = 2;
-        int sigma = 1, epsilon = 1;
+        int sigma = 1, epsilon = 5;
         int nb_particule;
         double Lx, Ly;
         double rcut;
@@ -90,8 +90,14 @@ class Univers {
 
 
     public : 
-            Univers(int dim, int nb_part, double Lx, double Ly, double rcut, std::vector<Cellule> nos_Cellules)
-            : dim(dim), nb_particule(nb_part), Lx(Lx), Ly(Ly), rcut(rcut), Cellules(std::move(nos_Cellules)) {}//move :on copie juste quelques pointeurs internes
+           Univers(int dim, int nb_part, double Lx, double Ly, double rcut, std::vector<Cellule> nos_Cellules)
+            : dim(dim), nb_particule(nb_part), Lx(Lx), Ly(Ly), rcut(rcut), Cellules(std::move(nos_Cellules))
+            {
+                ncd_x   = std::max(1, static_cast<int>(Lx / rcut));
+                ncd_y   = std::max(1, static_cast<int>(Ly / rcut));
+                cell_dx = Lx / ncd_x;
+                cell_dy = Ly / ncd_y;
+            }//move :on copie juste quelques pointeurs internes
             Univers() = default;
             void avancer_parts(double dt) {
                 for(auto& c : Cellules ){
@@ -192,7 +198,7 @@ class Univers {
 
                                     if (r <= rcut) { 
                                         double s_r6 = std::pow(sigma / r, 6);
-                                        double intensite = (24.0 * epsilon / r2) * s_r6 * (1.0 - 2.0 * s_r6);                                         
+                                        double intensite = (24.0 * epsilon / r2) * s_r6 * (2.0 * s_r6 - 1.0);                                         
                                         pI.setForce(0, pI.getForce(0) + intensite * dx);
                                         pI.setForce(1, pI.getForce(1) + intensite * dy);
                                     }
@@ -202,26 +208,26 @@ class Univers {
                     }
                 }
             }   
-
+            // version naiive !! REMEMBER to update it chef
             void maj_cellules() {
                 std::vector<Particule> toutes;
-                for (Cellule& c : Cellules) {
-                    for (Particule& p : c) {
+                for (Cellule& c : Cellules)
+                    for (Particule& p : c)
                         toutes.push_back(p);
-                    }
-                }
 
-                for (Cellule& c : Cellules) {
+                for (Cellule& c : Cellules)
                     c.vider();
-                }
 
                 for (Particule& p : toutes) {
-                    int cx = static_cast<int>(p.getPosition(0) / cell_dx);
-                    int cy = static_cast<int>(p.getPosition(1) / cell_dy);
-                    cx = std::max(0, std::min(cx, ncd_x - 1));
-                    cy = std::max(0, std::min(cy, ncd_y - 1));
-                    int idx = cx + cy * ncd_x;
-                    Cellules[idx].ajouterParticule(p);
+                    int cx = (int)(p.getPosition(0) / cell_dx);
+                    int cy = (int)(p.getPosition(1) / cell_dy);
+
+                    if (cx < 0) cx = 0;
+                    if (cx > ncd_x - 1) cx = ncd_x - 1;
+                    if (cy < 0) cy = 0;
+                    if (cy > ncd_y - 1) cy = ncd_y - 1;
+
+                    Cellules[cx + cy * ncd_x].ajouterParticule(p);
                 }
             }
 
