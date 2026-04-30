@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="680" viewBox="0 0 680 1420"
+     style="font-family: sans-serif; background: white;">
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5"
+            markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="#555" stroke-width="1.5"
+            stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="diamond-fill" viewBox="0 0 14 10" refX="1" refY="5"
+            markerWidth="8" markerHeight="6" orient="auto-start-reverse">
+      <polygon points="1,5 7,1 13,5 7,9" fill="#555" stroke="#555" stroke-width="1"/>
+    </marker>
+  </defs>
+
+  <!-- VECTEUR -->
+  <rect x="20" y="20" width="290" height="28" rx="6" fill="#9FE1CB" stroke="#0F6E56" stroke-width="0.8"/>
+  <rect x="20" y="20" width="290" height="274" rx="6" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.8"/>
+  <text x="165" y="38" text-anchor="middle" font-size="13" font-weight="bold" fill="#085041">vecteur</text>
+  <line x1="20" y1="48" x2="310" y2="48" stroke="#0F6E56" stroke-width="0.4" opacity="0.5"/>
+  <text x="30" y="66"  font-size="11" fill="#085041">- x : double</text>
+  <text x="30" y="82"  font-size="11" fill="#085041">- y : double</text>
+  <text x="30" y="98"  font-size="11" fill="#085041">- z : double</text>
+  <line x1="20" y1="108" x2="310" y2="108" stroke="#0F6E56" stroke-width="0.4" opacity="0.4"/>
+  <text x="30" y="124" font-size="11" fill="#085041">+ getX() : double</text>
+  <text x="30" y="140" font-size="11" fill="#085041">+ getY() : double</text>
+  <text x="30" y="156" font-size="11" fill="#085041">+ getZ() : double</text>
+  <text x="30" y="172" font-size="11" fill="#085041">+ setX(dx : double)</text>
+  <text x="30" y="188" font-size="11" fill="#085041">+ setY(dy : double)</text>
+  <text x="30" y="204" font-size="11" fill="#085041">+ setZ(dz : double)</text>
+  <text x="30" y="220" font-size="11" fill="#085041">+ sum_Vectors(v : vecteur) : vecteur</text>
+  <text x="30" y="236" font-size="11" fill="#085041">+ sub_Vectors(v : vecteur) : vecteur</text>
+  <text x="30" y="252" font-size="11" fill="#085041">+ multV_par_lambda(l : double) : vecteur</text>
+  <text x="30" y="268" font-size="11" fill="#085041">+ dot(v : vecteur) : double</text>
+  <text x="30" y="284" font-size="11" fill="#085041">+ norme() : double</text>
+
+  <!-- ENUM CATEGORIE -->
+  <rect x="360" y="20" width="290" height="28" rx="6" fill="#D3D1C7" stroke="#5F5E5A" stroke-width="0.8"/>
+  <rect x="360" y="20" width="290" height="92" rx="6" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.8"/>
+  <text x="505" y="38" text-anchor="middle" font-size="13" font-weight="bold" fill="#2C2C2A">&lt;&lt;enum&gt;&gt; Categorie</text>
+  <line x1="360" y1="48" x2="650" y2="48" stroke="#5F5E5A" stroke-width="0.4" opacity="0.5"/>
+  <text x="370" y="66"  font-size="11" fill="#2C2C2A">Proton</text>
+  <text x="370" y="82"  font-size="11" fill="#2C2C2A">Electron</text>
+  <text x="370" y="98"  font-size="11" fill="#2C2C2A">Neutron</text>
+
+  <!-- PARTICULE -->
+  <rect x="360" y="150" width="290" height="28" rx="6" fill="#AFA9EC" stroke="#3C3489" stroke-width="0.8"/>
+  <rect x="360" y="150" width="290" height="382" rx="6" fill="#EEEDFE" stroke="#3C3489" stroke-width="0.8"/>
+  <text x="505" y="168" text-anchor="middle" font-size="13" font-weight="bold" fill="#26215C">Particule</text>
+  <line x1="360" y1="178" x2="650" y2="178" stroke="#3C3489" stroke-width="0.4" opacity="0.5"/>
+  <text x="370" y="196" font-size="11" fill="#26215C">- position : vector&lt;double&gt;</text>
+  <text x="370" y="212" font-size="11" fill="#26215C">- vitesse : vector&lt;double&gt;</text>
+  <text x="370" y="228" font-size="11" fill="#26215C">- force : vector&lt;double&gt;</text>
+  <text x="370" y="244" font-size="11" fill="#26215C">- m : double</text>
+  <text x="370" y="260" font-size="11" fill="#26215C">- Id : int</text>
+  <text x="370" y="276" font-size="11" fill="#26215C">- Cat : Categorie</text>
+  <line x1="360" y1="286" x2="650" y2="286" stroke="#3C3489" stroke-width="0.4" opacity="0.4"/>
+  <text x="370" y="302" font-size="11" fill="#26215C">+ Particule()</text>
+  <text x="370" y="318" font-size="11" fill="#26215C">+ Particule(pos, vit, frc, m, Id, cat)</text>
+  <text x="370" y="334" font-size="11" fill="#26215C">+ getDim() : int</text>
+  <text x="370" y="350" font-size="11" fill="#26215C">+ getPosition(i : int) : double</text>
+  <text x="370" y="366" font-size="11" fill="#26215C">+ getVitesse(i : int) : double</text>
+  <text x="370" y="382" font-size="11" fill="#26215C">+ getForce(i : int) : double</text>
+  <text x="370" y="398" font-size="11" fill="#26215C">+ setPosition(i : int, val : double)</text>
+  <text x="370" y="414" font-size="11" fill="#26215C">+ setVitesse(i : int, val : double)</text>
+  <text x="370" y="430" font-size="11" fill="#26215C">+ setForce(i : int, val : double)</text>
+  <text x="370" y="446" font-size="11" fill="#26215C">+ getMas() : double</text>
+  <text x="370" y="462" font-size="11" fill="#26215C">+ getId() : int</text>
+  <text x="370" y="478" font-size="11" fill="#26215C">+ Fij(p2 : Particule&amp;)</text>
+  <text x="370" y="494" font-size="11" fill="#26215C">+ operator&lt;&lt;(os, v) : ostream&amp;</text>
+
+  <!-- Categorie utilise Particule -->
+  <line x1="505" y1="112" x2="505" y2="148" stroke="#555" stroke-width="0.8"
+        stroke-dasharray="4 3" marker-end="url(#arrow)"/>
+  <text x="516" y="133" font-size="10" fill="#555">utilise</text>
+
+  <!-- CELLULE -->
+  <rect x="20" y="360" width="290" height="28" rx="6" fill="#F0997B" stroke="#993C1D" stroke-width="0.8"/>
+  <rect x="20" y="360" width="290" height="380" rx="6" fill="#FAECE7" stroke="#993C1D" stroke-width="0.8"/>
+  <text x="165" y="378" text-anchor="middle" font-size="13" font-weight="bold" fill="#4A1B0C">Cellule</text>
+  <line x1="20" y1="388" x2="310" y2="388" stroke="#993C1D" stroke-width="0.4" opacity="0.5"/>
+  <text x="30" y="406" font-size="11" fill="#4A1B0C">- cx : double</text>
+  <text x="30" y="422" font-size="11" fill="#4A1B0C">- cy : double</text>
+  <text x="30" y="438" font-size="11" fill="#4A1B0C">- nb_voisins : int</text>
+  <text x="30" y="454" font-size="11" fill="#4A1B0C">- particules_internes : vector&lt;Particule&gt;</text>
+  <text x="30" y="470" font-size="11" fill="#4A1B0C">- indices_voisines : vector&lt;int&gt;</text>
+  <line x1="20" y1="480" x2="310" y2="480" stroke="#993C1D" stroke-width="0.4" opacity="0.4"/>
+  <text x="30" y="496" font-size="11" fill="#4A1B0C">+ Cellule()</text>
+  <text x="30" y="512" font-size="11" fill="#4A1B0C">+ Cellule(x : double, y : double)</text>
+  <text x="30" y="528" font-size="11" fill="#4A1B0C">+ getCx() : double</text>
+  <text x="30" y="544" font-size="11" fill="#4A1B0C">+ getCy() : double</text>
+  <text x="30" y="560" font-size="11" fill="#4A1B0C">+ setNbVoisin(dim : int)</text>
+  <text x="30" y="576" font-size="11" fill="#4A1B0C">+ getNbVoisins() : int</text>
+  <text x="30" y="592" font-size="11" fill="#4A1B0C">+ ajouterVoisin(index : int)</text>
+  <text x="30" y="608" font-size="11" fill="#4A1B0C">+ ajouterParticule(p : Particule)</text>
+  <text x="30" y="624" font-size="11" fill="#4A1B0C">+ nbParticules() : int</text>
+  <text x="30" y="640" font-size="11" fill="#4A1B0C">+ operator[](i : int) : Particule&amp;</text>
+  <text x="30" y="656" font-size="11" fill="#4A1B0C">+ getIndicesVoisines() : vector&lt;int&gt;&amp;</text>
+  <text x="30" y="672" font-size="11" fill="#4A1B0C">+ vider()</text>
+  <text x="30" y="688" font-size="11" fill="#4A1B0C">+ begin() : iterator</text>
+  <text x="30" y="704" font-size="11" fill="#4A1B0C">+ end() : iterator</text>
+
+  <!-- Cellule composition Particule -->
+  <path d="M310 478 Q344 478 344 290 Q344 166 358 166"
+        fill="none" stroke="#555" stroke-width="0.8"
+        marker-start="url(#diamond-fill)" marker-end="url(#arrow)"/>
+  <text x="348" y="340" font-size="10" fill="#555">1..*</text>
+
+  <!-- GRILLE -->
+  <rect x="360" y="580" width="290" height="28" rx="6" fill="#FAC775" stroke="#854F0B" stroke-width="0.8"/>
+  <rect x="360" y="580" width="290" height="212" rx="6" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.8"/>
+  <text x="505" y="598" text-anchor="middle" font-size="13" font-weight="bold" fill="#412402">Grille</text>
+  <line x1="360" y1="608" x2="650" y2="608" stroke="#854F0B" stroke-width="0.4" opacity="0.5"/>
+  <text x="370" y="626" font-size="11" fill="#412402">- nx : int</text>
+  <text x="370" y="642" font-size="11" fill="#412402">- ny : int</text>
+  <text x="370" y="658" font-size="11" fill="#412402">- taille_cellule : double</text>
+  <text x="370" y="674" font-size="11" fill="#412402">- cellules : vector&lt;Cellule&gt;</text>
+  <line x1="360" y1="684" x2="650" y2="684" stroke="#854F0B" stroke-width="0.4" opacity="0.4"/>
+  <text x="370" y="700" font-size="11" fill="#412402">+ Grille()</text>
+  <text x="370" y="716" font-size="11" fill="#412402">+ Grille(x : int, y : int, taille : double)</text>
+  <text x="370" y="732" font-size="11" fill="#412402">+ getnx() : double</text>
+  <text x="370" y="748" font-size="11" fill="#412402">+ getny() : double</text>
+  <text x="370" y="764" font-size="11" fill="#412402">+ getIndex(x : int, y : int) : int</text>
+  <text x="370" y="780" font-size="11" fill="#412402">+ getCellule(x : int, y : int) : Cellule&amp;</text>
+
+  <!-- Grille composition Cellule -->
+  <line x1="360" y1="666" x2="312" y2="590"
+        stroke="#555" stroke-width="0.8"
+        marker-start="url(#diamond-fill)" marker-end="url(#arrow)"/>
+  <text x="316" y="622" font-size="10" fill="#555">1..*</text>
+
+  <!-- NOTE Grille -->
+  <rect x="360" y="800" width="268" height="22" rx="4"
+        fill="#F1EFE8" stroke="#B4B2A9" stroke-width="0.5"/>
+  <text x="370" y="815" font-size="10" fill="#5F5E5A">Note : Grille declaree, non utilisee par Univers</text>
+
+  <!-- UNIVERS -->
+  <rect x="20" y="840" width="630" height="28" rx="6" fill="#85B7EB" stroke="#185FA5" stroke-width="0.8"/>
+  <rect x="20" y="840" width="630" height="556" rx="6" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.8"/>
+  <text x="335" y="858" text-anchor="middle" font-size="13" font-weight="bold" fill="#042C53">Univers</text>
+  <line x1="20" y1="868" x2="650" y2="868" stroke="#185FA5" stroke-width="0.4" opacity="0.5"/>
+  <text x="30" y="886"  font-size="11" fill="#042C53">- dim : int</text>
+  <text x="30" y="902"  font-size="11" fill="#042C53">- sigma : int</text>
+  <text x="30" y="918"  font-size="11" fill="#042C53">- epsilon : int</text>
+  <text x="30" y="934"  font-size="11" fill="#042C53">- nb_particule : int</text>
+  <text x="30" y="950"  font-size="11" fill="#042C53">- Lx : double</text>
+  <text x="30" y="966"  font-size="11" fill="#042C53">- Ly : double</text>
+  <text x="30" y="982"  font-size="11" fill="#042C53">- rcut : double</text>
+  <text x="30" y="998"  font-size="11" fill="#042C53">- ncd_x : int</text>
+  <text x="30" y="1014" font-size="11" fill="#042C53">- ncd_y : int</text>
+  <text x="30" y="1030" font-size="11" fill="#042C53">- cell_dx : double</text>
+  <text x="30" y="1046" font-size="11" fill="#042C53">- cell_dy : double</text>
+  <text x="30" y="1062" font-size="11" fill="#042C53">- Cellules : vector&lt;Cellule&gt;</text>
+  <text x="30" y="1078" font-size="11" fill="#042C53">- particules : vector&lt;Particule*&gt;</text>
+  <line x1="20" y1="1088" x2="650" y2="1088" stroke="#185FA5" stroke-width="0.4" opacity="0.4"/>
+  <text x="30" y="1104" font-size="11" fill="#042C53">+ Univers()</text>
+  <text x="30" y="1120" font-size="11" fill="#042C53">+ Univers(dim, nb_part, Lx, Ly, rcut, cellules)</text>
+  <text x="30" y="1136" font-size="11" fill="#042C53">+ getNbPart() : int</text>
+  <text x="30" y="1152" font-size="11" fill="#042C53">+ getCellules() : vector&lt;Cellule&gt;&amp;</text>
+  <text x="30" y="1168" font-size="11" fill="#042C53">+ avancer_parts(dt : double)</text>
+  <text x="30" y="1184" font-size="11" fill="#042C53">+ maj_vitesse(dt : double)</text>
+  <text x="30" y="1200" font-size="11" fill="#042C53">+ maj_cellules()</text>
+  <text x="30" y="1216" font-size="11" fill="#042C53">+ all_forces()</text>
+  <text x="30" y="1232" font-size="11" fill="#042C53">+ initialiserVoisins(ncx : int, ncy : int)</text>
+  <text x="30" y="1248" font-size="11" fill="#042C53">+ P_Lennard_Jones(rij : double) : double</text>
+  <text x="30" y="1264" font-size="11" fill="#042C53">+ univers_state()</text>
+
+  <!-- Univers composition Cellule -->
+  <line x1="165" y1="840" x2="165" y2="742"
+        stroke="#555" stroke-width="0.8"
+        marker-start="url(#diamond-fill)" marker-end="url(#arrow)"/>
+  <text x="178" y="796" font-size="10" fill="#555">1..*</text>
+
+</svg>
