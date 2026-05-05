@@ -1,10 +1,66 @@
-#include "Particule.hpp"
+
+/**
+ * @file Particule.cpp
+ * @brief Implémentations de la classe Particule, des fonctions libres
+ *        associées et point d'entrée du programme.
+ */
+
+#include "Particule.hxx"
 #include <iostream>
 #include <cmath>
 #include <list>
 #include <random>
 #include <chrono>
 #include <vector>
+
+// ===============================
+// Classe Particule
+// ===============================
+
+Particule::Particule(std::vector<double> pos,
+                     std::vector<double> vitess,
+                     std::vector<double> force,
+                     double m,
+                     int Id,
+                     Categorie cat)
+    : position(pos), vitesse(vitess), force(force), m(m), Id(Id), Cat(cat) {}
+
+int Particule::getDim() const { return position.size(); }
+
+double Particule::getPosition(int i) const { return position[i]; }
+double Particule::getVitesse(int i) const  { return vitesse[i]; }
+double Particule::getForce(int i) const    { return force[i]; }
+
+void Particule::setPosition(int i, double val) { position[i] = val; }
+void Particule::setVitesse(int i, double val)  { vitesse[i] = val; }
+void Particule::setForce(int i, double val)    { force[i] = val; }
+
+double Particule::getMas() const { return m; }
+int    Particule::getId()  const { return Id; }
+
+// La modification repose sur la 3ème loi de Newton :
+// si la particule i exerce une force sur j, alors j exerce la même force sur i, mais dans le sens opposé
+void Particule::Fij(Particule& p2){
+    double rij = 0;
+    double m2 =  p2.getMas();
+    int dim = getDim();
+    for(int i = 0; i < dim; i++){
+        double res_int = std::pow(position[i]- p2.getPosition(i), 2);
+        rij+=res_int;
+    }
+    if (rij < 1e-9) return;
+    double dist  = std::sqrt(rij);
+    double res = (m2*m)/pow(dist,3);
+    for (int i = 0; i < dim; i++) {
+        double f_comp = res * (p2.getPosition(i) - position[i]);
+        force[i] += f_comp;
+        p2.setForce(i, p2.getForce(i) - f_comp);
+    }
+}
+
+// ===============================
+// Fonctions libres
+// ===============================
 
 double dist(const Particule& p1, const Particule& p2) {
     double sum = 0.0;
