@@ -1,67 +1,408 @@
+/**
+ * @file Univers.cxx
+ * @brief Implémentations des classes Cellule, Grille et Univers.
+ */
+
 #include "Univers.hxx"
 #include <iostream>
-#include <vector>
 #include <cmath>
-#include <random>
+#include <algorithm>
 
+// =====================================================
+// Cellule
+// =====================================================
 
-int main() {
+Cellule::Cellule() : cx(0.0), cy(0.0) {}
+Cellule::Cellule(double x, double y) : cx(x), cy(y) {}
 
-    // Univers u(2, 1, 10.0, 10.0, 2.5);
-    // Particule p({9.8, 5.0}, {1.0, 0.5}, {0.0, 0.0}, 1.0, 1, Categorie::Proton);
-    // u.ajouterParticule(p);
-    // for (int i = 0; i < 5; ++i) {
-    //     u.avancer_parts(0.1);
-    //     u.appliquer_reflection();
-    //     u.univers_state();
-    // }
-    // u.univers_state();
+double Cellule::getCx() const         { return cx; }
+double Cellule::getCy() const         { return cy; }
+int    Cellule::getNbVoisins() const  { return nb_voisins; }
+int    Cellule::nbParticules() const  { return particules_internes.size(); }
 
-    // // Test absorption
-    // Univers u2(2, 1, 10.0, 10.0, 2.5);
-    // u2.ajouterParticule(p);
-    // for (int i = 0; i < 5; ++i) {
-    //     u2.avancer_parts(0.1);
-    //     u2.appliquer_absorption();
-    //     u2.univers_state(); // doit disparaître après quelques steps
-    // }
-    // u2.univers_state(); 
-
-    // // Test périodique
-    // Univers u3(2, 1, 10.0, 10.0, 2.5);
-    // u3.ajouterParticule(p);
-    // for (int i = 0; i < 5; ++i) {
-    //     u3.avancer_parts(0.1);
-    //     u3.appliquer_periodique();
-    //     u3.univers_state(); // réapparaît de l'autre côté
-    // }
-
-    // Réflexion géométrique
-    Univers u1(2, 1, 10.0, 10.0, 2.5);
-    Particule p({9.5, 5.0}, {1.0, 0.0}, {0.0, 0.0}, 1.0, 1, Categorie::Proton);
-    u1.ajouterParticule(p);
-    for (int i = 0; i < 10; ++i) {
-        u1.avancer_parts(0.1);
-        u1.appliquer_reflection();
-        u1.univers_state(i);
-    }
-
-    // Réflexion potentiel
-    Univers u2(2, 1, 10.0, 10.0, 2.5);
-    Particule p2({8.0, 5.0}, {1.0, 0.0}, {0.0, 0.0}, 1.0, 1, Categorie::Proton);
-    u2.ajouterParticule(p2);
-    for (int i = 0; i < 30; ++i) {
-        u2.all_forces();
-        u2.potentiel_reflex();
-        u2.maj_vitesse(0.1);
-        u2.avancer_parts(0.1);
-        u2.univers_state(i);
-    }
-    // Réflexion géométrique : inversion instantanée de la vitesse au contact du bord, position corrigée brutalement.
-    //Potentiel : la particule ralentit progressivement avant le bord, repart doucement — plus physique mais la vitesse finale (-0.99) est légèrement inférieure à la vitesse initiale (1.0) → perte d'énergie due à la discrétisation en temps (dt trop grand).
-    //Les deux approches donnent le même comportement macroscopique mais le potentiel est plus réaliste physiquement.
-    
-    return 0;
+void Cellule::setNbVoisin(int dim) {
+    nb_voisins = static_cast<int>(std::pow(3, dim));
 }
 
+void Cellule::ajouterVoisin(int index) {
+    indices_voisines.push_back(index);
+}
 
+void Cellule::ajouterParticule(const Particule& p) {
+    particules_internes.push_back(p);
+}
+
+void Cellule::vider() {
+    particules_internes.clear();
+}
+
+std::vector<Particule>& Cellule::getParticules() {
+    return particules_internes;
+}
+
+const std::vector<Particule>& Cellule::getParticules() const {
+    return particules_internes;
+}
+
+const std::vector<int>& Cellule::getIndicesVoisines() const {
+    return indices_voisines;
+}
+
+Particule& Cellule::operator[](int i) {
+    return particules_internes[i];
+}
+
+// =====================================================
+// Grille
+// =====================================================
+
+/* AVANT (warning de conversion int <- double) :
+   Grille() : nx(1.0), ny(1.0), taille_cellule(3.0) {} */
+Grille::Grille() : nx(1), ny(1), taille_cellule(3.0) {}
+
+Grille::Grille(int x, int y, double taille)
+    : nx(x), ny(y), taille_cellule(taille) {
+    cellules.resize(x * y);
+    for (int j = 0; j < y; ++j)
+        for (int i = 0; i < x; ++i)
+            cellules[i + j * x] = Cellule((i + 0.5) * taille,
+                                          (j + 0.5) * taille);
+}
+
+int Grille::getNx() const { return nx; }
+int Grille::getNy() const { return ny; }
+
+int Grille::getIndex(int x, int y) const {
+    return x + nx * y;
+}
+
+Cellule& Grille::getCellule(int x, int y) {
+    return cellules[getIndex(x, y)];
+}
+
+std::vector<Cellule>& Grille::getCellules() {
+    return cellules;
+}
+
+const std::vector<Cellule>& Grille::getCellules() const {
+    return cellules;
+}
+
+void Grille::initialiserVoisins() {
+    for (int y = 0; y < ny; ++y) {
+        for (int x = 0; x < nx; ++x) {
+            int currentIdx = x + y * nx;
+            for (int dy = -1; dy <= 1; ++dy) {
+                for (int dx = -1; dx <= 1; ++dx) {
+                    int nx_voisin = x + dx;
+                    int ny_voisin = y + dy;
+                    if (nx_voisin >= 0 && nx_voisin < nx &&
+                        ny_voisin >= 0 && ny_voisin < ny) {
+                        int voisinIdx = nx_voisin + ny_voisin * nx;
+                        cellules[currentIdx].ajouterVoisin(voisinIdx);
+                    }
+                }
+            }
+        }
+    }
+}
+
+// =====================================================
+// Univers
+// =====================================================
+
+Univers::Univers(int dim, int nb_part, double Lx, double Ly, double rcut)
+    : dim(dim), nb_particule(0), Lx(Lx), Ly(Ly), rcut(rcut) {
+    int ncd_x = std::max(1, static_cast<int>(Lx / rcut));
+    int ncd_y = std::max(1, static_cast<int>(Ly / rcut));
+    grille = Grille(ncd_x, ncd_y, rcut);
+    grille.initialiserVoisins();
+    // Note: nb_part servait juste de hint à l'origine ; on initialise nb_particule
+    // à 0 et on l'incrémente dans ajouterParticule pour qu'il reflète le réel.
+    (void)nb_part;
+}
+
+// ----- Accès -----
+
+int Univers::getNbPart() const { return nb_particule; }
+
+std::vector<Cellule>& Univers::getCellules() {
+    return grille.getCellules();
+}
+
+const std::vector<Cellule>& Univers::getCellules() const {
+    return grille.getCellules();
+}
+
+// ----- Gestion des particules -----
+
+/* AVANT (nb_particule jamais mis à jour, getNbPart() renvoyait une valeur figée) :
+   void ajouterParticule(const Particule& p) {
+       double cell_dx = Lx / grille.getNx();
+       double cell_dy = Ly / grille.getNy();
+       int cx = std::max(0, std::min((int)(p.getPosition(0) / cell_dx), grille.getNx() - 1));
+       int cy = std::max(0, std::min((int)(p.getPosition(1) / cell_dy), grille.getNy() - 1));
+       grille.getCellule(cx, cy).ajouterParticule(p);
+   } */
+void Univers::ajouterParticule(const Particule& p) {
+    double cell_dx = Lx / grille.getNx();
+    double cell_dy = Ly / grille.getNy();
+    int cx = std::max(0, std::min(static_cast<int>(p.getPosition(0) / cell_dx),
+                                  grille.getNx() - 1));
+    int cy = std::max(0, std::min(static_cast<int>(p.getPosition(1) / cell_dy),
+                                  grille.getNy() - 1));
+    grille.getCellule(cx, cy).ajouterParticule(p);
+    ++nb_particule;
+}
+
+void Univers::maj_cellules() {
+    double cell_dx = Lx / grille.getNx();
+    double cell_dy = Ly / grille.getNy();
+    auto& cellules = grille.getCellules();
+
+    std::vector<Particule> toutes;
+    for (Cellule& c : cellules)
+        for (Particule& p : c)
+            toutes.push_back(p);
+
+    for (Cellule& c : cellules)
+        c.vider();
+
+    for (auto& p : toutes) {
+        int cx = std::max(0, std::min(static_cast<int>(p.getPosition(0) / cell_dx),
+                                      grille.getNx() - 1));
+        int cy = std::max(0, std::min(static_cast<int>(p.getPosition(1) / cell_dy),
+                                      grille.getNy() - 1));
+        grille.getCellule(cx, cy).ajouterParticule(p);
+    }
+}
+
+// ----- Intégration en temps -----
+
+void Univers::avancer_parts(double dt) {
+    for (auto& c : grille.getCellules())
+        for (auto& p : c)
+            for (int d = 0; d < dim; ++d)
+                p.setPosition(d, p.getPosition(d) + p.getVitesse(d) * dt);
+}
+
+void Univers::maj_vitesse(double dt) {
+    for (Cellule& c : grille.getCellules())
+        for (auto& p : c)
+            for (int d = 0; d < dim; ++d) {
+                double a = p.getForce(d) / p.getMas();
+                p.setVitesse(d, p.getVitesse(d) + a * dt);
+            }
+}
+
+// ----- Potentiels -----
+
+/* AVANT (sigma/rij^6 calculé deux fois) :
+   double P_Lennard_Jones(double rij){
+       double res = 4*(std::pow(sigma/rij,6))*(std::pow(sigma/rij,6)-1);
+       return res;
+   } */
+double Univers::P_Lennard_Jones(double rij) const {
+    double sr6 = std::pow(sigma / rij, 6);
+    return 4.0 * sr6 * (sr6 - 1.0);
+}
+
+/* AVANT (std::pow(temp, 6) calculé deux fois) :
+   double P_limites_reflex(double r){
+       if (r < 1e-10) return 0.0;
+       double temp = sigma / (2.0 * r);
+       return -24.0 * epsilon * (1.0 / (2.0 * r)) * std::pow(temp, 6) * (1.0 - 2.0 * std::pow(temp, 6));
+   } */
+double Univers::P_limites_reflex(double r) const {
+    if (r < 1e-10) return 0.0;
+    double temp = sigma / (2.0 * r);
+    double t6   = std::pow(temp, 6);
+    return -24.0 * epsilon * (1.0 / (2.0 * r)) * t6 * (1.0 - 2.0 * t6);
+}
+
+// ----- Forces -----
+
+/* AVANT (mélange des responsabilités : LJ + gravité + réflexion auto) :
+   void all_forces() {
+       ... LJ ...
+       applique_Potentiel_gravitationnel();
+       appliquer_reflection();
+   } */
+void Univers::all_forces() {
+    auto& cellules = grille.getCellules();
+
+    // Remise à zéro des forces
+    for (Cellule& c : cellules)
+        for (Particule& p : c)
+            for (int d = 0; d < dim; ++d)
+                p.setForce(d, 0.0);
+
+    // Lennard-Jones via linked-cell
+    for (Cellule& celluleA : cellules) {
+        for (Particule& pI : celluleA) {
+            for (int idxVoisin : celluleA.getIndicesVoisines()) {
+                Cellule& cellVoisine = cellules[idxVoisin];
+
+                double dxC = pI.getPosition(0) - cellVoisine.getCx();
+                double dyC = pI.getPosition(1) - cellVoisine.getCy();
+                double distCentre = std::sqrt(dxC * dxC + dyC * dyC);
+
+                if (distCentre <= rcut) {
+                    for (Particule& pJ : cellVoisine) {
+                        if (&pI == &pJ) continue;
+
+                        double dx = pI.getPosition(0) - pJ.getPosition(0);
+                        double dy = pI.getPosition(1) - pJ.getPosition(1);
+                        double r2 = dx * dx + dy * dy;
+                        double r  = std::sqrt(r2);
+
+                        if (r <= rcut) {
+                            double s_r6 = std::pow(sigma / r, 6);
+                            double intensite = (24.0 * epsilon / r2) * s_r6
+                                             * (2.0 * s_r6 - 1.0);
+                            if (intensite >  5000.0) intensite =  5000.0;
+                            if (intensite < -5000.0) intensite = -5000.0;
+                            pI.setForce(0, pI.getForce(0) + intensite * dx);
+                            pI.setForce(1, pI.getForce(1) + intensite * dy);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    // NOTE : gravité et conditions de bord à appeler explicitement par l'utilisateur.
+}
+
+void Univers::applique_Potentiel_gravitationnel() {
+    for (Cellule& c : grille.getCellules())
+        for (Particule& p : c) {
+            double df = p.getMas() * G;
+            p.setForce(1, p.getForce(1) + df);
+        }
+}
+
+// ----- Conditions aux bords -----
+
+void Univers::appliquer_reflection() {
+    for (Cellule& c : grille.getCellules()) {
+        for (Particule& p : c) {
+            for (int d = 0; d < dim; ++d) {
+                double pos = p.getPosition(d);
+                double L   = (d == 0) ? Lx : Ly;
+                if (pos < 0) {
+                    p.setPosition(d, -pos);
+                    p.setVitesse(d, -p.getVitesse(d));
+                } else if (pos >= L) {
+                    p.setPosition(d, 2 * L - pos);
+                    p.setVitesse(d, -p.getVitesse(d));
+                }
+            }
+        }
+    }
+}
+
+/* AVANT (variable Trash inutile, nb_particule pas mis à jour) :
+   void appliquer_absorption() {
+       std::vector<Particule> Trash;
+       for (Cellule& c : grille.getCellules()){
+           for(auto it = c.getParticules().begin(); it != c.getParticules().end(); ){
+               ...
+               if (pos < 0 || pos >= L) {
+                   Trash.push_back(*it);   // <- inutile
+                   est_absorbee = true;
+                   break;
+               }
+               ...
+           }
+       }
+   } */
+void Univers::appliquer_absorption() {
+    for (Cellule& c : grille.getCellules()) {
+        auto& parts = c.getParticules();
+        for (auto it = parts.begin(); it != parts.end(); ) {
+            bool est_absorbee = false;
+            for (int d = 0; d < dim; ++d) {
+                double pos = it->getPosition(d);
+                double L   = (d == 0) ? Lx : Ly;
+                if (pos < 0 || pos >= L) {
+                    est_absorbee = true;
+                    break;
+                }
+            }
+            if (est_absorbee) {
+                it = parts.erase(it);
+                --nb_particule;
+            } else {
+                ++it;
+            }
+        }
+    }
+}
+
+void Univers::appliquer_periodique() {
+    for (Cellule& c : grille.getCellules())
+        for (Particule& p : c)
+            for (int d = 0; d < dim; ++d) {
+                double L   = (d == 0) ? Lx : Ly;
+                double pos = p.getPosition(d);
+                if (pos < 0)  p.setPosition(d, pos + L);
+                if (pos >= L) p.setPosition(d, pos - L);
+            }
+}
+
+void Univers::potentiel_reflex() {
+    double rcut_bis = sigma * std::pow(2.0, 1.0 / 6.0);
+    for (Cellule& c : grille.getCellules()) {
+        for (Particule& p : c) {
+            for (int d = 0; d < dim; ++d) {
+                double pos = p.getPosition(d);
+                double L   = (d == 0) ? Lx : Ly;
+
+                double r = pos;
+                if (r > 0 && r < rcut_bis) {
+                    double df = P_limites_reflex(r);
+                    p.setForce(d, p.getForce(d) - df);
+                }
+                r = L - pos;
+                if (r > 0 && r < rcut_bis) {
+                    double df = P_limites_reflex(r);
+                    p.setForce(d, p.getForce(d) + df);
+                }
+            }
+        }
+    }
+}
+
+// ----- Diagnostic -----
+
+void Univers::univers_state(int step) const {
+    if (step >= 0) std::cout << "--- Step " << step << " ---\n";
+    int i = 1;
+    for (const auto& c : grille.getCellules()) {
+        for (const auto& p : c) {
+            std::cout << "P" << i << " pos=("
+                      << p.getPosition(0) << ", " << p.getPosition(1) << ")"
+                      << " vit=("
+                      << p.getVitesse(0) << ", " << p.getVitesse(1) << ")\n";
+            ++i;
+        }
+    }
+    if (i == 1) std::cout << "  (aucune particule)\n";
+}
+
+double Univers::calculer_Ec() const {
+    double Ec = 0.0;
+    for (const auto& c : grille.getCellules())
+        for (const auto& p : c)
+            for (int d = 0; d < dim; ++d)
+                Ec += 0.5 * p.getMas() * p.getVitesse(d) * p.getVitesse(d);
+    return Ec;
+}
+
+void Univers::rescaleV(double Ec_cible) {
+    double beta = std::sqrt(Ec_cible / calculer_Ec());
+    for (Cellule& c : grille.getCellules())
+        for (Particule& p : c)
+            for (int d = 0; d < dim; ++d)
+                p.setVitesse(d, beta * p.getVitesse(d));
+}

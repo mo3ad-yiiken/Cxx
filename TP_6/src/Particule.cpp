@@ -1,10 +1,60 @@
-#include "Particule.hpp"
+/**
+ * @file Particule.cpp
+ * @brief Implémentations de la classe Particule et des fonctions libres associées.
+ */
+
+#include "Particule.hxx"
 #include <iostream>
 #include <cmath>
-#include <list>
-#include <random>
-#include <chrono>
-#include <vector>
+
+// ===============================
+// Classe Particule
+// ===============================
+
+Particule::Particule(std::vector<double> pos,
+                     std::vector<double> vitess,
+                     std::vector<double> force,
+                     double m,
+                     int Id,
+                     Categorie cat)
+    : position(pos), vitesse(vitess), force(force), m(m), Id(Id), Cat(cat) {}
+
+int Particule::getDim() const { return position.size(); }
+
+double Particule::getPosition(int i) const { return position[i]; }
+double Particule::getVitesse(int i) const  { return vitesse[i]; }
+double Particule::getForce(int i) const    { return force[i]; }
+
+void Particule::setPosition(int i, double val) { position[i] = val; }
+void Particule::setVitesse(int i, double val)  { vitesse[i] = val; }
+void Particule::setForce(int i, double val)    { force[i] = val; }
+
+double Particule::getMas() const { return m; }
+int    Particule::getId()  const { return Id; }
+
+// La modification repose sur la 3ème loi de Newton :
+// si la particule i exerce une force sur j, alors j exerce la même force sur i, mais dans le sens opposé
+void Particule::Fij(Particule& p2){
+    double rij = 0;
+    double m2 =  p2.getMas();
+    int dim = getDim();
+    for(int i = 0; i < dim; i++){
+        double res_int = std::pow(position[i]- p2.getPosition(i), 2);
+        rij+=res_int;
+    }
+    if (rij < 1e-9) return;
+    double dist  = std::sqrt(rij);
+    double res = (m2*m)/pow(dist,3);
+    for (int i = 0; i < dim; i++) {
+        double f_comp = res * (p2.getPosition(i) - position[i]);
+        force[i] += f_comp;
+        p2.setForce(i, p2.getForce(i) - f_comp);
+    }
+}
+
+// ===============================
+// Fonctions libres
+// ===============================
 
 double dist(const Particule& p1, const Particule& p2) {
     double sum = 0.0;
@@ -75,51 +125,4 @@ void Stormer_Verlet(std::vector<Particule>& particules, std::vector<std::vector<
             std::cout << " " << p.getVitesse(k);
         std::cout << "\n";
     }
-}
-
-int main() {
-
-
-    std::vector<Particule> particules;
-
-    particules.emplace_back(
-        std::vector<double>{0.0,  0.0},
-        std::vector<double>{0.0,  0.0},
-        std::vector<double>{0.0,  0.0},
-        1.0, 0, Categorie::Proton
-    );
-    particules.emplace_back(
-        std::vector<double>{0.0,    1.0},
-        std::vector<double>{-1.0,   0.0},
-        std::vector<double>{0.0,    0.0},
-        3.0e-6, 1, Categorie::Proton
-    );
-    particules.emplace_back(
-        std::vector<double>{0.0,    5.36},
-        std::vector<double>{-0.425, 0.0},
-        std::vector<double>{0.0,    0.0},
-        9.55e-4, 2, Categorie::Proton
-    );
-    particules.emplace_back(
-        std::vector<double>{34.75,  0.0},
-        std::vector<double>{0.0,    0.0296},
-        std::vector<double>{0.0,    0.0},
-        1.0e-14, 3, Categorie::Proton
-    );
-
-    std::cout << "Nombre de particules : " << particules.size() << "\n";
-
-    int dim = particules[0].getDim();
-
-    std::vector<std::vector<double>> Fold(particules.size(), std::vector<double>(dim, 0.0));
-
-    auto start = std::chrono::steady_clock::now();
-
-    Stormer_Verlet(particules, Fold);
-
-    auto end = std::chrono::steady_clock::now();
-    std::chrono::duration<double> elapsed = end - start;
-    std::cout << "Elapsed time: " << elapsed.count() << "s\n";
-
-    return 0;
 }

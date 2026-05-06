@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "Particule.hpp" 
+#include "Particule.hxx" 
 
 // Suite de tests pour la classe Particule
 

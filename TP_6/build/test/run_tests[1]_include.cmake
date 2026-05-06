@@ -1,5 +1,0 @@
-if(EXISTS "/home/mo3ad/Documents/ENSIMAG/Second-year/C++/TP_CPP_touatia_iknem/Cxx/TP_5/build/test/run_tests[1]_tests.cmake")
-  include("/home/mo3ad/Documents/ENSIMAG/Second-year/C++/TP_CPP_touatia_iknem/Cxx/TP_5/build/test/run_tests[1]_tests.cmake")
-else()
-  add_test(run_tests_NOT_BUILT run_tests_NOT_BUILT)
-endif()
